@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fiches produits — JLEvenement</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-contenu">
+      <a href="../index.html" class="logo">
+        <span class="logo-jl">JL</span><span class="logo-evenement">Evenement</span>
+      </a>
+      <nav class="nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../catalogue.html">Catalogue</a>
+        <a href="../index.html#realisations">Nos réalisations</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-produit">
+    <div class="container">
+      <h1 style="font-family:var(--police-titre); font-size:2rem; margin-bottom:16px;">Fiches produits</h1>
+      <p style="color:var(--gris); margin-bottom:24px;">Cette section prépare la future intégration de fiches produit issues d’un Google Sheet via Apps Script.</p>
+      <div class="produits-grille" id="liste-produits"></div>
+    </div>
+  </main>
+
+  <script src="../products.js"></script>
+  <script>
+    (function() {
+      var liste = document.getElementById('liste-produits');
+      if (!liste || !window.PRODUCTS) return;
+      var html = '';
+      for (var i = 0; i < PRODUCTS.length; i++) {
+        var p = PRODUCTS[i];
+        var slug = (p.nom || '').toLowerCase().normalize('NFD').replace(/[^\w\s-]/g, '').trim().replace(/[-\s]+/g, '-');
+        html += '<div class="produit-carte">' +
+          '<div class="produit-image"><img src="' + p.image + '" alt="' + p.nom + '" loading="lazy"></div>' +
+          '<div class="produit-corps">' +
+            '<div class="produit-nom">' + p.nom + '</div>' +
+            '<div class="produit-description">' + p.description + '</div>' +
+            '<div class="produit-prix">' + Math.round(p.prix) + ' €</div>' +
+            '<a class="bouton-fiche" href="produit-template.html?id=' + p.id + '">Ouvrir la fiche</a>' +
+          '</div>' +
+        '</div>';
+      }
+      liste.innerHTML = html;
+    })();
+  </script>
+</body>
+</html>
