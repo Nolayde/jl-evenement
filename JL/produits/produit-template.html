@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fiche produit — JLEvenement</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-contenu">
+      <a href="../index.html" class="logo">
+        <span class="logo-jl">JL</span><span class="logo-evenement">Evenement</span>
+      </a>
+      <nav class="nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../catalogue.html">Catalogue</a>
+        <a href="../index.html#realisations">Nos réalisations</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a href="../catalogue.html" class="bouton-secondaire">Retour au catalogue</a>
+        <button class="bouton-panier" id="btn-panier" aria-label="Ouvrir le panier">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          <span class="badge-panier" id="badge-panier">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-produit">
+    <div class="container">
+      <section class="fiche-produit" id="fiche-produit">
+        <div class="fiche-image" id="fiche-image"></div>
+        <div>
+          <span class="fiche-categorie" id="fiche-categorie">Produit</span>
+          <h1 id="fiche-nom">Nom du produit</h1>
+          <p class="fiche-description" id="fiche-description">Description du produit à personnaliser.</p>
+          <div class="fiche-prix" id="fiche-prix">0 €</div>
+          <div class="fiche-actions">
+            <button class="ajout-panier" id="ajout-panier-btn">Ajouter au panier</button>
+            <a href="../catalogue.html" class="bouton-secondaire">Retour au catalogue</a>
+          </div>
+          <div class="fiche-meta">
+            <span id="fiche-id">ID : -</span>
+            <span id="fiche-source">Source : CSV/Google Sheets</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="fiche-section">
+        <h2>Informations complémentaires</h2>
+        <p>Cette fiche est prête pour un futur import depuis Google Sheets via Apps Script. Les champs ci-dessous peuvent être enrichis sans modifier la structure de la page.</p>
+        <ul class="fiche-list">
+          <li>Image principale : champ image</li>
+          <li>Texte de présentation : champ description</li>
+          <li>Prix : champ prix</li>
+          <li>Catégorie : champ catégorie</li>
+          <li>Informations supplémentaires : champs libres à ajouter</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="panneau-panier" id="cart-panel">
+    <div class="panneau-panier-entete">
+      <h2>Votre Panier</h2>
+      <button id="btn-fermer-panier" aria-label="Fermer le panier">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div id="panier-corps">
+      <div class="panier-vide" id="panier-vide"><p>Votre panier est vide</p></div>
+    </div>
+    <div id="panier-pied">
+      <div class="panier-resume">
+        <div class="panier-total"><span class="panier-total-label"></span></div>
+        <div id="panier-detail" class="panier-detail"></div>
+        <div class="panier-total-final"><span>Total</span><span id="panier-total">0 €</span></div>
+      </div>
+      <button class="bouton-devis-panier" id="btn-devis-panier">Demander un devis</button>
+    </div>
+  </div>
+
+  <script src="../products.js"></script>
+  <script src="../cart.js"></script>
+  <script src="../main.js"></script>
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var id = parseInt(params.get('id'), 10);
+      var produit = null;
+
+      if (Number.isFinite(id)) {
+        for (var i = 0; i < PRODUCTS.length; i++) {
+          if (PRODUCTS[i].id === id) { produit = PRODUCTS[i]; break; }
+        }
+      }
+
+      function formatPrix(n) {
+        return Math.round(n) + ' €';
+      }
+
+      if (!produit) {
+        document.getElementById('fiche-nom').textContent = 'Produit non trouvé';
+        document.getElementById('fiche-description').textContent = 'Ce produit n’existe pas encore dans la base locale. La fiche est prête pour un futur import depuis Google Sheets.';
+        document.getElementById('fiche-prix').textContent = 'À venir';
+        document.getElementById('ajout-panier-btn').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('fiche-categorie').textContent = produit.categorie;
+      document.getElementById('fiche-nom').textContent = produit.nom;
+      document.getElementById('fiche-description').textContent = produit.description;
+      document.getElementById('fiche-prix').textContent = formatPrix(produit.prix);
+      document.getElementById('fiche-id').textContent = 'ID : ' + produit.id;
+
+      var imageEl = document.getElementById('fiche-image');
+      imageEl.innerHTML = '<img src="' + produit.image + '" alt="' + produit.nom + '" loading="lazy">';
+
+      document.getElementById('ajout-panier-btn').addEventListener('click', function() {
+        Cart.ajouter(produit.id);
+      });
+    })();
+  </script>
+</body>
+</html>
